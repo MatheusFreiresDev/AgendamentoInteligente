@@ -6,6 +6,7 @@ import com.SistemaAgendamento.Agendamento.Paciente.PacienteModel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 public class AgendamentoModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +23,8 @@ public class AgendamentoModel {
     private String titulo;
     private LocalDateTime dataHoraInicio;
     @Enumerated(EnumType.STRING)
-    private Status status;
+    @Builder.Default
+    private Status status = Status.PENDENTE;
     @OneToMany(mappedBy = "agendamentos")
     @JsonIgnore
     private List<PacienteModel> listaPacientes;
