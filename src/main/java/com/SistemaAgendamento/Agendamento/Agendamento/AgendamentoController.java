@@ -17,14 +17,14 @@ public class AgendamentoController {
         this.agendamentoService = agendamentoService;
     }
 
-    @PostMapping("/criar") // Corrigido: usa path direto
+    @PostMapping // Corrigido: usa path direto
     public ResponseEntity<?> criarAgendamento(@RequestBody AgendamentoDTO agendamentoDTO) {
         AgendamentoDTO novoAgendamento = agendamentoService.adicionarAgendamento(agendamentoDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Agendamento de " + agendamentoDTO.getTitulo() + " (" + agendamentoDTO.getId() + ") foi criado com sucesso.");
     }
 
-    @GetMapping("/listar")
+    @GetMapping
     public ResponseEntity<?> listarAgendamentos(){
         List<AgendamentoDTO> list = agendamentoService.lista();
         if(list.isEmpty()) {
@@ -35,7 +35,7 @@ public class AgendamentoController {
         }
     }
 
-    @GetMapping("/listar/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> listarId(@PathVariable Long id) {
         AgendamentoDTO agendamentoDTO = agendamentoService.listarID(id);
         if(agendamentoDTO != null) {
@@ -46,7 +46,7 @@ public class AgendamentoController {
         }
     }
 
-    @PutMapping("/atualizar/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable long id, @RequestBody AgendamentoDTO agendamentoDTO)  {
         AgendamentoDTO agendamentoDTO1 = agendamentoService.listarID(id);
         if(agendamentoDTO1 != null) {
@@ -58,7 +58,7 @@ public class AgendamentoController {
         }
     }
 
-    @DeleteMapping("/deletar/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable long id) {
         AgendamentoDTO agendamentoDTO = agendamentoService.listarID(id);
         if(agendamentoDTO != null) {

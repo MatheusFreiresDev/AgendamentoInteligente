@@ -1,9 +1,7 @@
 package com.SistemaAgendamento.Agendamento.Medicos;
 
-import com.SistemaAgendamento.Agendamento.Agendamento.AgendamentoDTO;
-import com.SistemaAgendamento.Agendamento.Agendamento.AgendamentoModel;
-import com.SistemaAgendamento.Agendamento.Agendamento.AgendamentoRepository;
-import com.SistemaAgendamento.Agendamento.Agendamento.Status;
+import com.SistemaAgendamento.Agendamento.Agendamento.*;
+import com.SistemaAgendamento.Agendamento.Paciente.PacienteDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -14,11 +12,13 @@ public class MedicoService {
     MedicoMapper medicoMapper;
     MedicoRepository medicoRepository ;
     AgendamentoRepository agendamentoRepository;
+    AgendamentoMapper agendamentoMapper;
 
-    public MedicoService(MedicoMapper medicoMapper, AgendamentoRepository agendamentoRepository, MedicoRepository medicoRepository) {
+    public MedicoService(MedicoMapper medicoMapper, AgendamentoMapper agendamentoMapper, MedicoRepository medicoRepository, AgendamentoRepository agendamentoRepository) {
         this.medicoMapper = medicoMapper;
-        this.agendamentoRepository = agendamentoRepository;
+        this.agendamentoMapper = agendamentoMapper;
         this.medicoRepository = medicoRepository;
+        this.agendamentoRepository = agendamentoRepository;
     }
 
     public MedicoDTO criar(MedicoDTO medicoDTO) {
@@ -48,7 +48,13 @@ public class MedicoService {
         medicoRepository.deleteById(id);
     }
 
-
+    public AgendamentoDTO atender() {
+        List<AgendamentoDTO> lista = agendamentoRepository.findByStatusOrderByDataHoraInicioAsc(Status.PENDENTE).stream().map(agendamentoMapper::map).toList();
+        AgendamentoDTO agendamentoDTO = lista.get(0);
+        agendamentoDTO.setStatus(Status.CONFIRMADO);
+        agendamentoRepository.save(agendamentoMapper.map(agendamentoDTO));
+        return agendamentoDTO;
+    }
 
 
 
