@@ -1,5 +1,6 @@
 package com.SistemaAgendamento.Agendamento.Paciente;
 
+import com.SistemaAgendamento.Agendamento.Agendamento.AgendamentoDTO;
 import com.SistemaAgendamento.Agendamento.Agendamento.AgendamentoModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class PacienteDTO {
     private Long id;
     private String nome;
-    private AgendamentoModel agendamentos;
+    private AgendamentoDTO agendamentos;
 }
