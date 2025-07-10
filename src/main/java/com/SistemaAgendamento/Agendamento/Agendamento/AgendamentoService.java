@@ -47,17 +47,13 @@ public class AgendamentoService {
     public void deletar (long id){
         agendamentoRepository.deleteById(id);
     }
-    public AgendamentoDTO confimarAgendamento (long id) {
-        AgendamentoDTO agendamentoDTO = agendamentoMapper.map( agendamentoRepository.findById(id).orElse(null));
+    public AgendamentoDTO confimarAgendamento (AgendamentoDTO agendamentoDTO) {
         agendamentoDTO.setStatus(Status.CONFIRMADO);
-        agendamentoRepository.save(agendamentoMapper.map(agendamentoDTO));
         return agendamentoDTO;
     }
 
-    public AgendamentoDTO cancelarAgendamento (long id) {
-        AgendamentoDTO agendamentoDTO = agendamentoMapper.map( agendamentoRepository.findById(id).orElse(null));
+    public AgendamentoDTO cancelarAgendamento (AgendamentoDTO agendamentoDTO) {
         agendamentoDTO.setStatus(Status.CANCELADO);
-        agendamentoRepository.save(agendamentoMapper.map(agendamentoDTO));
         return agendamentoDTO;
     }
 
