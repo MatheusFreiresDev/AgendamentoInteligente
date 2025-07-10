@@ -13,8 +13,6 @@ public class AgendamentoMapper {
         agendamentoModel.setTitulo(agendamentoDTO.getTitulo());
         agendamentoModel.setDataHoraInicio(agendamentoDTO.getDataHoraInicio());
         agendamentoModel.setStatus(agendamentoDTO.getStatus());
-        agendamentoModel.setListaPacientes(agendamentoDTO.getListaPacientes());
-
         return agendamentoModel;
     }
 
@@ -26,7 +24,6 @@ public class AgendamentoMapper {
         agendamentoDTO.setTitulo(agendamentoModel.getTitulo());
         agendamentoDTO.setDataHoraInicio(agendamentoModel.getDataHoraInicio());
         agendamentoDTO.setStatus(agendamentoModel.getStatus());
-        agendamentoDTO.setListaPacientes(agendamentoModel.getListaPacientes());
 
         return agendamentoDTO;
     }

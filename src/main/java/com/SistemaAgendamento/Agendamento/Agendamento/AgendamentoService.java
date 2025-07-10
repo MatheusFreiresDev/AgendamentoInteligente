@@ -9,52 +9,58 @@ import java.util.stream.Collectors;
 
 @Service
 public class AgendamentoService {
-    AgendamentoMapper agendamentoMapper;
-    AgendamentoRepository agendamentoRepository;
+    private final AgendamentoMapper agendamentoMapper;
+    private final AgendamentoRepository agendamentoRepository;
 
     public AgendamentoService(AgendamentoRepository agendamentoRepository, AgendamentoMapper agendamentoMapper) {
         this.agendamentoRepository = agendamentoRepository;
         this.agendamentoMapper = agendamentoMapper;
     }
 
-    //Adicionar
     public AgendamentoDTO adicionarAgendamento(AgendamentoDTO agendamentoDTO) {
         agendamentoRepository.save(agendamentoMapper.map(agendamentoDTO));
         return agendamentoDTO;
     }
 
-    //listar
-
     public List<AgendamentoDTO> lista() {
-     List<AgendamentoModel> listaModel = agendamentoRepository.findAll();
-     return listaModel.stream().map(agendamentoMapper::map).collect(Collectors.toList());
+        return agendamentoRepository.findAll()
+                .stream()
+                .map(agendamentoMapper::map)
+                .collect(Collectors.toList());
     }
 
-    // listar id
     public AgendamentoDTO listarID(Long id){
-        Optional<AgendamentoModel> opicional = agendamentoRepository.findById(id);
-       return opicional.map(agendamentoMapper::map).orElse(null);
+        return agendamentoRepository.findById(id)
+                .map(agendamentoMapper::map)
+                .orElse(null);
     }
 
-    // Atualizar Agendamento
-    public AgendamentoDTO atualizar(Long id,AgendamentoDTO agendamentoDTO) {
+    public AgendamentoDTO atualizar(Long id, AgendamentoDTO agendamentoDTO) {
         agendamentoDTO.setId(id);
         agendamentoRepository.save(agendamentoMapper.map(agendamentoDTO));
         return agendamentoDTO;
-
     }
 
-    public void deletar (long id){
+    public void deletar(long id) {
         agendamentoRepository.deleteById(id);
     }
-    public AgendamentoDTO confimarAgendamento (AgendamentoDTO agendamentoDTO) {
-        agendamentoDTO.setStatus(Status.CONFIRMADO);
-        return agendamentoDTO;
+
+    public AgendamentoDTO confirmarAgendamento(Long id) {
+        AgendamentoModel agendamento = agendamentoRepository.findById(id).orElse(null);
+        if (agendamento == null) return null;
+
+        agendamento.setStatus(Status.CONFIRMADO);
+        agendamentoRepository.save(agendamento);
+        return agendamentoMapper.map(agendamento);
     }
 
-    public AgendamentoDTO cancelarAgendamento (AgendamentoDTO agendamentoDTO) {
-        agendamentoDTO.setStatus(Status.CANCELADO);
-        return agendamentoDTO;
+    public AgendamentoDTO cancelarAgendamento(Long id) {
+        AgendamentoModel agendamento = agendamentoRepository.findById(id).orElse(null);
+        if (agendamento == null) return null;
+
+        agendamento.setStatus(Status.CANCELADO);
+        agendamentoRepository.save(agendamento);
+        return agendamentoMapper.map(agendamento);
     }
 
 }

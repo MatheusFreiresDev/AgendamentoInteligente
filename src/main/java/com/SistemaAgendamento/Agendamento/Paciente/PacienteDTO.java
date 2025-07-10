@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class PacienteDTO {
     private Long id;
     private String nome;
-    private AgendamentoDTO agendamentos;
+    private AgendamentoDTO agendamento;
 }

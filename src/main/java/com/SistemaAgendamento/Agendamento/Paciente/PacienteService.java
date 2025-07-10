@@ -9,12 +9,14 @@ import java.util.stream.Stream;
 
 @Service
 public class PacienteService {
-    PacienteRepository pacienteRepository;
-    PacienteMapper pacienteMapper;
-    AgendamentoService agendamentoService;
-    AgendamentoRepository agendamentoRepository;
 
-    public PacienteService(PacienteRepository pacienteRepository, AgendamentoRepository agendamentoRepository, AgendamentoService agendamentoService, PacienteMapper pacienteMapper) {
+    private final PacienteRepository pacienteRepository;
+    private final AgendamentoRepository agendamentoRepository;
+    private final AgendamentoService agendamentoService;
+    private final PacienteMapper pacienteMapper;
+
+    public PacienteService(PacienteRepository pacienteRepository, AgendamentoRepository agendamentoRepository,
+                           AgendamentoService agendamentoService, PacienteMapper pacienteMapper) {
         this.pacienteRepository = pacienteRepository;
         this.agendamentoRepository = agendamentoRepository;
         this.agendamentoService = agendamentoService;
@@ -22,18 +24,34 @@ public class PacienteService {
     }
 
     public PacienteDTO criar(PacienteDTO pacienteDTO) {
-        pacienteRepository.save(pacienteMapper.map(pacienteDTO));
+        // Pega o ID do agendamento do DTO
+        Long agendamentoId = pacienteDTO.getAgendamento() != null ? pacienteDTO.getAgendamento().getId() : null;
+        AgendamentoModel agendamento = null;
+        if (agendamentoId != null) {
+            // Busca o agendamento gerenciado do banco
+            agendamento = agendamentoRepository.findById(agendamentoId).orElse(null);
+        }
+
+        // Mapeia o DTO pra entidade
+        PacienteModel paciente = pacienteMapper.map(pacienteDTO);
+
+        // Define o agendamento já gerenciado
+        paciente.setAgendamento(agendamento);
+
+        // Salva o paciente
+        pacienteRepository.save(paciente);
+
         return pacienteDTO;
     }
 
     public List<PacienteDTO> lista() {
-        List<PacienteDTO> lista = (pacienteRepository.findAll()).stream().map(pacienteMapper::map).toList();
-        return lista;
+        return pacienteRepository.findAll().stream()
+                .map(pacienteMapper::map)
+                .toList();
     }
 
     public PacienteDTO listarId(Long id) {
-        PacienteDTO pacienteDTO = pacienteMapper.map(pacienteRepository.findById(id).orElse(null));
-        return pacienteDTO;
+        return pacienteMapper.map(pacienteRepository.findById(id).orElse(null));
     }
 
     public PacienteDTO atualizar(Long id, PacienteDTO pacienteDTO) {
@@ -46,69 +64,79 @@ public class PacienteService {
         pacienteRepository.deleteById(id);
     }
 
-    public AgendamentoDTO confirmar(Long id) {
-        PacienteDTO pacienteDTO = pacienteMapper.map(pacienteRepository.findById(id).orElse(null));
-        AgendamentoDTO agendamentoDTO = pacienteDTO.getAgendamentos();
-        agendamentoService.confimarAgendamento(agendamentoDTO);
-        agendamentoService.atualizar(agendamentoDTO.getId(), agendamentoDTO);
-        return agendamentoDTO;
+    public String confirmar(Long idPaciente) {
+        PacienteModel paciente = pacienteRepository.findById(idPaciente).orElse(null);
+        if (paciente == null) return "Paciente não encontrado";
+
+        AgendamentoModel agendamento = paciente.getAgendamento();
+        if (agendamento == null) return "Paciente não tem agendamento";
+
+        agendamento.setStatus(Status.CONFIRMADO);
+        agendamentoRepository.save(agendamento);
+
+        return "Agendamento confirmado para " + paciente.getNome();
     }
 
-    public AgendamentoDTO cancelar(Long id) {
-        PacienteDTO pacienteDTO = pacienteMapper.map(pacienteRepository.findById(id).orElse(null));
-        AgendamentoDTO agendamentoDTO = pacienteDTO.getAgendamentos();
-        agendamentoService.cancelarAgendamento(agendamentoDTO);
-        agendamentoService.atualizar(agendamentoDTO.getId(), agendamentoDTO);
-        return agendamentoDTO;
+    public String cancelar(Long idPaciente) {
+        PacienteModel paciente = pacienteRepository.findById(idPaciente).orElse(null);
+        if (paciente == null) return "Paciente não encontrado";
+
+        AgendamentoModel agendamento = paciente.getAgendamento();
+        if (agendamento == null) return "Paciente não tem agendamento";
+
+        agendamento.setStatus(Status.CANCELADO);
+        agendamentoRepository.save(agendamento);
+
+        return "Agendamento cancelado para " + paciente.getNome();
     }
 
-    public String proxAgendamento(Long id) {
-        PacienteDTO pacienteDTO = pacienteMapper.map(pacienteRepository.findById(id).orElse(null));
-        String agendamentoEmTexto = pacienteDTO.getNome() + "seu agendamento atual : " + pacienteDTO.getAgendamentos().getTitulo();
-        return agendamentoEmTexto;
+    public String proxAgendamento(Long idPaciente) {
+        PacienteModel paciente = pacienteRepository.findById(idPaciente).orElse(null);
+        if (paciente == null) return "Paciente não encontrado";
+
+        AgendamentoModel agendamento = paciente.getAgendamento();
+        if (agendamento == null) return "Paciente não tem agendamento";
+
+        return paciente.getNome() + ", seu agendamento atual: " + agendamento.getTitulo();
     }
-    public String removerAgendamento(Long id){
-        PacienteModel pacienteModel = pacienteRepository.findById(id).orElse(null);
-        if (pacienteModel == null) {
-            return "Paciente com id " + id + " não encontrado.";
+
+    public String removerAgendamento(Long idPaciente) {
+        PacienteModel paciente = pacienteRepository.findById(idPaciente).orElse(null);
+        if (paciente == null) return "Paciente não encontrado";
+
+        AgendamentoModel agendamento = paciente.getAgendamento();
+        if (agendamento == null) return "Paciente não possui agendamento para remover";
+
+        if (agendamento.getStatus() == Status.PENDENTE) {
+            return "Esse agendamento não pode ser removido pois está PENDENTE";
         }
 
-        if (pacienteModel.getAgendamentos() == null) {
-            return "Esse paciente não possui nenhum agendamento para remover.";
-        }
-        if (pacienteModel.getAgendamentos().getStatus() == Status.PENDENTE) {
-            return "Esse agendamento não está disponível pois esta Pendente";
-        }
+        paciente.setAgendamento(null);
+        pacienteRepository.save(paciente);
 
-        pacienteModel.setAgendamentos(null);
-        pacienteRepository.save(pacienteModel);
-
-        // Força atualizar no banco e limpar cache JPA
+        // Opcional: força atualizar e limpar cache
         pacienteRepository.flush();
 
-        return pacienteModel.getNome() + ", seu agendamento foi removido.";
+        return paciente.getNome() + ", seu agendamento foi removido.";
     }
 
     public String adicionarAgendamento(Long idPaciente, Long idAgendamento) {
-        PacienteModel pacienteModel = pacienteRepository.findById(idPaciente).orElse(null);
-        if (pacienteModel == null) {
-            return "Paciente com id " + idPaciente + " não encontrado.";
-        }
+        PacienteModel paciente = pacienteRepository.findById(idPaciente).orElse(null);
+        if (paciente == null) return "Paciente não encontrado";
 
-        if (pacienteModel.getAgendamentos() != null) {
+        if (paciente.getAgendamento() != null) {
             return "Você ainda possui um agendamento. Remova-o primeiro.";
         }
 
-        AgendamentoModel agendamentoModel = agendamentoRepository.findById(idAgendamento).orElse(null);
-        if (agendamentoModel == null) {
-            return "Agendamento com id " + idAgendamento + " não encontrado.";
-        }
-            agendamentoModel.setStatus(Status.PENDENTE);
-            pacienteModel.setAgendamentos(agendamentoModel);
-            pacienteRepository.save(pacienteModel);
+        AgendamentoModel agendamento = agendamentoRepository.findById(idAgendamento).orElse(null);
+        if (agendamento == null) return "Agendamento não encontrado";
 
-            return "O agendamento de " + agendamentoModel.getTitulo() + " foi adicionado.";
-        }
+        agendamento.setStatus(Status.PENDENTE);
+        paciente.setAgendamento(agendamento);
 
+        pacienteRepository.save(paciente);
+
+        return "O agendamento de " + agendamento.getTitulo() + " foi adicionado.";
+    }
     }
 

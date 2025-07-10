@@ -2,6 +2,7 @@ package com.SistemaAgendamento.Agendamento.Agendamento;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.SistemaAgendamento.Agendamento.Medicos.MedicoModel;
 import com.SistemaAgendamento.Agendamento.Paciente.PacienteModel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -25,7 +26,9 @@ public class AgendamentoModel {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private Status status = Status.PENDENTE;
-    @OneToMany(mappedBy = "agendamentos")
-    @JsonIgnore
-    private List<PacienteModel> listaPacientes;
+
+    @ManyToOne
+    @JoinColumn(name = "medico_id")
+    private MedicoModel medico;
+
 }

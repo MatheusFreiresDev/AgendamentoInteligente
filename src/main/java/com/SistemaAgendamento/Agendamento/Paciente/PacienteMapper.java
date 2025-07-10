@@ -17,9 +17,8 @@ public class PacienteMapper {
         PacienteDTO pacienteDTO = new PacienteDTO();
         pacienteDTO.setId(pacienteModel.getId());
         pacienteDTO.setNome(pacienteModel.getNome());
-        pacienteDTO.setAgendamentos(
-                agendamentoMapper.map(pacienteModel.getAgendamentos())  // o próprio mapper já faz null check
-        );
+        pacienteDTO.setAgendamento(agendamentoMapper.map(pacienteModel.getAgendamento()));
+
         return pacienteDTO;
     }
 
@@ -29,9 +28,7 @@ public class PacienteMapper {
         PacienteModel pacienteModel = new PacienteModel();
         pacienteModel.setId(pacienteDTO.getId());
         pacienteModel.setNome(pacienteDTO.getNome());
-        pacienteModel.setAgendamentos(
-                agendamentoMapper.map(pacienteDTO.getAgendamentos())  // idem
-        );
+        pacienteDTO.setAgendamento(agendamentoMapper.map(pacienteModel.getAgendamento()));
         return pacienteModel;
     }
 }

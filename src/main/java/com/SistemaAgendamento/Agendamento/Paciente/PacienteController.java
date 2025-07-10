@@ -65,37 +65,7 @@ public class PacienteController {
         return ResponseEntity.ok("Paciente " + pacienteDTO.getNome() + " foi removido dos registros.");
     }
 
-    @PatchMapping("/confirmar/{id}")
-    public ResponseEntity<String> confirmar(@PathVariable Long id) {
-        PacienteDTO pacienteDTO = pacienteService.listarId(id);
-        if (pacienteDTO == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Paciente com id " + id + " não encontrado.");
-        }
-        AgendamentoDTO agendamentoDTO = pacienteDTO.getAgendamentos();
-        if (agendamentoDTO == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Paciente não possui agendamento para confirmar.");
-        }
-        pacienteService.confirmar(id);
-        return ResponseEntity.ok("Agendamento de " + agendamentoDTO.getTitulo() + " foi confirmado.");
-    }
 
-    @PatchMapping("/cancelar/{id}")
-    public ResponseEntity<String> cancelar(@PathVariable Long id) {
-        PacienteDTO pacienteDTO = pacienteService.listarId(id);
-        if (pacienteDTO == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Paciente com id " + id + " não encontrado.");
-        }
-        AgendamentoDTO agendamentoDTO = pacienteDTO.getAgendamentos();
-        if (agendamentoDTO == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Paciente não possui agendamento para cancelar.");
-        }
-        pacienteService.cancelar(id);
-        return ResponseEntity.ok("Agendamento de " + agendamentoDTO.getTitulo() + " foi cancelado.");
-    }
 
     @PatchMapping("/adicionarAgendamento/{idPaciente}/{idAgendamento}")
     public ResponseEntity<String> adicionarAgendamento(@PathVariable Long idPaciente, @PathVariable Long idAgendamento) {

@@ -1,0 +1,7 @@
+ALTER TABLE tb_agendamentos
+ADD COLUMN medico_id BIGINT;
+
+ALTER TABLE tb_agendamentos
+ADD CONSTRAINT fk_medico_agendamento
+FOREIGN KEY (medico_id) REFERENCES tb_medicos(id);
+

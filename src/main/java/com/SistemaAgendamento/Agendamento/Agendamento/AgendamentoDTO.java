@@ -18,6 +18,5 @@ public class AgendamentoDTO {
     private String titulo;
     private LocalDateTime dataHoraInicio;
     private Status status;
-    private List<PacienteModel> listaPacientes;
 
 }
